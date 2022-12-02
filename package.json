@@ -6,11 +6,11 @@
   "license": "MIT",
   "insomnia": {
     "name": "azure-keyvault-secrets",
-    "displayName": "Azure Key Vault secrets",
+    "displayName": "Azure Key Vault Secrets",
     "description": "A plugin to get secrets from Azure Key Vault",
     "images": {
       "icon": "azure-key-vault.svg",
-      "cover": "azure-key-vault.svg"
+      "cover": "plugin-background.png"
     },
     "publisher": {
       "name": "Gianluigi Conti",
@@ -19,18 +19,15 @@
     "unlisted": false
   },
   "repository": {
-    "url": "git@github.com:repo.git"
+    "url": "git@github.com:glconti/insomnia-plugin-azure-keyvault-secrets.git"
   },
   "keywords": [
-    "oauth",
-    "oauth2",
     "insomnia",
-    "plugin"
+    "plugin",
+    "azure",
+    "keyvault"
   ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "description": "",
+  "description": "An Insomnia plugin to get secrets from Azure Key Vault",
   "dependencies": {
     "@azure/identity": "^3.1.1",
     "@azure/keyvault-secrets": "^4.6.0"
