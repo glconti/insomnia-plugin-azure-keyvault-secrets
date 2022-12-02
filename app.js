@@ -3,25 +3,48 @@ const { DefaultAzureCredential } = require("@azure/identity");
 
 const logAppName = '[azure-keyvault-secrets]'
 
+const secretsCache = {
+    _secrets: {},
+    getSecret(secretName) {
+        return this._secrets[secretName] || null;
+    },
+    setSecret(secretName, secretValue) {
+        this._secrets[secretName] = secretValue;
+    }
+}
+
 const getKeyVaultSecret = async function (keyVaultName, secretName) {
 
-    const credential = new DefaultAzureCredential();
+    var cacheSecretName = keyVaultName + secretName
+    var cachedSecretValue = secretsCache.getSecret(cacheSecretName);
 
-    const url = "https://" + keyVaultName + ".vault.azure.net";
-    const client = new SecretClient(url, credential);
+    if (cachedSecretValue == null) {
 
-    const secret = await client.getSecret(secretName);
+        const credential = new DefaultAzureCredential();
 
-    console.log(logAppName, `read secret ${secretName} from ${url}`);
+        const url = "https://" + keyVaultName + ".vault.azure.net";
+        const client = new SecretClient(url, credential);
 
-    return secret.value;
+        const secret = await client.getSecret(secretName);
+
+        console.log(logAppName, `read secret ${secretName} from ${url}`);
+
+        cachedSecretValue = secret.value;
+
+        secretsCache.setSecret(cacheSecretName, cachedSecretValue);
+    }
+    else {
+        console.log(logAppName, `read secret ${secretName} from cache`);
+    }
+
+    return cachedSecretValue;
 }
 
 const secretTag = {
     name: 'azureSecret',
     displayName: 'Azure Key Vault Secret',
     liveDisplayName: (args) => {
-        return `Secret => ${args[0].value}`;        
+        return `Secret => ${args[0].value}`;
     },
     description: 'Retrieve an azure Key Vault Secret by name',
     args: [{
@@ -31,7 +54,6 @@ const secretTag = {
         defaultValue: ''
     }],
     async run(context, secretName) {
-        console.log(logAppName, `getting azureSecret ${secretName}`);
 
         const keyVaultName = await context.context.AZURE_KEYVAULT;
 
