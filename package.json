@@ -4,6 +4,7 @@
   "main": "app.js",
   "author": "Gianluigi Conti",
   "license": "MIT",
+  "homepage": "https://github.com/glconti/insomnia-plugin-azure-keyvault-secrets",
   "insomnia": {
     "name": "azure-keyvault-secrets",
     "displayName": "Azure Key Vault Secrets",
@@ -19,7 +20,8 @@
     "unlisted": false
   },
   "repository": {
-    "url": "git@github.com:glconti/insomnia-plugin-azure-keyvault-secrets.git"
+    "type": "git",
+    "url": "https://github.com/glconti/insomnia-plugin-azure-keyvault-secrets.git"
   },
   "keywords": [
     "insomnia",
