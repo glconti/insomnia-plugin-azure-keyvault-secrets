@@ -1,6 +1,6 @@
 {
   "name": "insomnia-plugin-azure-keyvault-secrets",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "main": "app.js",
   "author": "Gianluigi Conti",
   "license": "MIT",
@@ -10,8 +10,7 @@
     "displayName": "Azure Key Vault Secrets",
     "description": "A plugin to get secrets from Azure Key Vault",
     "images": {
-      "icon": "azure-key-vault.svg",
-      "cover": "plugin-background.png"
+      "icon": "azure-key-vault.svg"
     },
     "publisher": {
       "name": "Gianluigi Conti",
