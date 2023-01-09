@@ -1,3 +1,5 @@
+If you like this plugin, [leave it a :star: on Github!](https://github.com/glconti/insomnia-plugin-azure-keyvault-secrets)
+
 # Azure Key Vault Secrets for Insomnia
 
 ![Azure Key Vault Secrets for Insomnia Logo](https://unpkg.com/insomnia-plugin-azure-keyvault-secrets/plugin-background.png)
