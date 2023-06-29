@@ -1,6 +1,6 @@
 {
   "name": "insomnia-plugin-azure-keyvault-secrets",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "app.js",
   "author": "Gianluigi Conti",
   "license": "MIT",
@@ -30,7 +30,7 @@
   ],
   "description": "An Insomnia plugin to get secrets from Azure Key Vault",
   "dependencies": {
-    "@azure/identity": "^3.1.1",
-    "@azure/keyvault-secrets": "^4.6.0"
+    "@azure/identity": "^3.2.3",
+    "@azure/keyvault-secrets": "^4.7.0"
   }
 }
