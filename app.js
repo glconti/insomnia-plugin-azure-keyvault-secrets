@@ -1,44 +1,44 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
 
-const logAppName = '[azure-keyvault-secrets]'
+const logAppName = '[azure-keyvault-secrets]';
 
 const secretsCache = {
     _secrets: {},
     getSecret(secretName) {
-        return this._secrets[secretName] || null;
+        return this._secrets[secretName] ?? null;
     },
     setSecret(secretName, secretValue) {
         this._secrets[secretName] = secretValue;
-    }
-}
+    },
+};
 
 const getKeyVaultSecret = async function (keyVaultName, secretName) {
+    const cacheSecretName = `${keyVaultName}${secretName}`;
+    const cachedSecretValue = secretsCache.getSecret(cacheSecretName);
 
-    var cacheSecretName = keyVaultName + secretName
-    var cachedSecretValue = secretsCache.getSecret(cacheSecretName);
+    if (cachedSecretValue !== null) {
+        console.log(logAppName, `read secret ${secretName} from cache`);
+        return cachedSecretValue;
+    }
 
-    if (cachedSecretValue == null) {
+    const credential = new DefaultAzureCredential();
+    const url = `https://${keyVaultName}.vault.azure.net`;
+    const client = new SecretClient(url, credential);
 
-        const credential = new DefaultAzureCredential();
-
-        const url = "https://" + keyVaultName + ".vault.azure.net";
-        const client = new SecretClient(url, credential);
-
+    try {
         const secret = await client.getSecret(secretName);
-
         console.log(logAppName, `read secret ${secretName} from ${url}`);
 
-        cachedSecretValue = secret.value;
+        const secretValue = secret?.value;
+        secretsCache.setSecret(cacheSecretName, secretValue);
 
-        secretsCache.setSecret(cacheSecretName, cachedSecretValue);
+        return secretValue;
+    } catch (error) {
+        console.error(logAppName, `failed to read secret ${secretName} from ${url}: ${error}`);
+        return null;
     }
-    else {
-        console.log(logAppName, `read secret ${secretName} from cache`);
-    }
-
-    return cachedSecretValue;
-}
+};
 
 const secretTag = {
     name: 'azureSecret',
