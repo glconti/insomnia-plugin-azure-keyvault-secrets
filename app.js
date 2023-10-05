@@ -1,5 +1,7 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
+const fs = require('fs');
+require("dotenv").config();
 
 const logAppName = '[azure-keyvault-secrets]';
 
