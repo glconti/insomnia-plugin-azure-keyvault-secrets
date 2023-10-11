@@ -1,5 +1,7 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
+const fs = require('fs');
+require("dotenv").config();
 
 const logAppName = '[azure-keyvault-secrets]';
 
@@ -24,7 +26,17 @@ const getKeyVaultSecret = async function (keyVaultName, secretName) {
 
     const credential = new DefaultAzureCredential();
     const url = `https://${keyVaultName}.vault.azure.net`;
-    const client = new SecretClient(url, credential);
+
+    var clientOptions = undefined;
+    if (process.env.NODE_EXTRA_CA_CERTS) {
+        clientOptions = {
+            tlsOptions: {
+                ca: fs.readFileSync(process.env.NODE_EXTRA_CA_CERTS)
+            }
+        };
+    }
+
+    const client = new SecretClient(url, credential, clientOptions);
 
     try {
         const secret = await client.getSecret(secretName);
