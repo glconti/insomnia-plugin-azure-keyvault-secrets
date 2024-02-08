@@ -1,5 +1,6 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
+const fs = require("fs")
 
 const logAppName = '[azure-keyvault-secrets]';
 
@@ -13,7 +14,7 @@ const secretsCache = {
     },
 };
 
-const getKeyVaultSecret = async function (keyVaultName, secretName) {
+const getKeyVaultSecret = async function (keyVaultName, secretName, keyVaultCACert) {
     const cacheSecretName = `${keyVaultName}${secretName}`;
     const cachedSecretValue = secretsCache.getSecret(cacheSecretName);
 
@@ -24,7 +25,16 @@ const getKeyVaultSecret = async function (keyVaultName, secretName) {
 
     const credential = new DefaultAzureCredential();
     const url = `https://${keyVaultName}.vault.azure.net`;
-    const client = new SecretClient(url, credential);
+
+    const opts = {}
+
+    if (keyVaultCACert) {
+        console.log(logAppName, `using custom CA certificate at ${keyVaultCACert} for Azure KeyVault`)
+        opts.tlsOptions = {
+            ca: [fs.readFileSync(keyVaultCACert)]
+        }
+    }
+    const client = new SecretClient(url, credential, opts);
 
     try {
         const secret = await client.getSecret(secretName);
@@ -56,13 +66,14 @@ const secretTag = {
     async run(context, secretName) {
 
         const keyVaultName = await context.context.AZURE_KEYVAULT;
+        const keyVaultCACert = await context.context.AZURE_KEYVAULT_CA_CERT;
 
         if (typeof keyVaultName === 'undefined') {
             console.error(logAppName, 'missing AZURE_KEYVAULT environment variable');
             return '';
         }
 
-        const secretValue = getKeyVaultSecret(keyVaultName, secretName);
+        const secretValue = getKeyVaultSecret(keyVaultName, secretName, keyVaultCACert);
 
         return secretValue;
     }
