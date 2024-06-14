@@ -41,3 +41,7 @@ The live preview will show the value. Click Done.
 ### Notes
 The secrets are retrieved once and cached for the lifetime of the application because Insomnia evaluates all environment variables and template tags very often.
 To force the retrieval of the secrets simply restart Insomnia.
+
+### Usage behind company firewall
+
+If you need to inject local trusted certificates into the plugin, you can do so by setting the `AZURE_KEYVAULT_CA_CERT` environment variable to the path of the certificate file. [See PR](https://github.com/glconti/insomnia-plugin-azure-keyvault-secrets/pull/5/files) 
