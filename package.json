@@ -31,6 +31,6 @@
   "description": "An Insomnia plugin to get secrets from Azure Key Vault",
   "dependencies": {
     "@azure/identity": "^4.4.1",
-    "@azure/keyvault-secrets": "^4.8.1"
+    "@azure/keyvault-secrets": "^4.8.0"
   }
 }
