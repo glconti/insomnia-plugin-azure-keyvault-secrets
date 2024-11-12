@@ -1,6 +1,6 @@
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
-const fs = require("fs")
+const fs = require("fs");
 
 const logAppName = '[azure-keyvault-secrets]';
 
@@ -14,6 +14,9 @@ const secretsCache = {
     },
 };
 
+const credential = new DefaultAzureCredential();
+let secretClientCache = {};
+
 const getKeyVaultSecret = async function (keyVaultName, secretName, keyVaultCACert) {
     const cacheSecretName = `${keyVaultName}${secretName}`;
     const cachedSecretValue = secretsCache.getSecret(cacheSecretName);
@@ -23,18 +26,22 @@ const getKeyVaultSecret = async function (keyVaultName, secretName, keyVaultCACe
         return cachedSecretValue;
     }
 
-    const credential = new DefaultAzureCredential();
     const url = `https://${keyVaultName}.vault.azure.net`;
 
-    const opts = {}
+    if (!secretClientCache[keyVaultName]) {
+        const opts = {};
 
-    if (keyVaultCACert) {
-        console.log(logAppName, `using custom CA certificate at ${keyVaultCACert} for Azure KeyVault`)
-        opts.tlsOptions = {
-            ca: [fs.readFileSync(keyVaultCACert)]
+        if (keyVaultCACert) {
+            console.log(logAppName, `using custom CA certificate at ${keyVaultCACert} for Azure KeyVault`);
+            opts.tlsOptions = {
+                ca: [fs.readFileSync(keyVaultCACert)]
+            };
         }
+        
+        secretClientCache[keyVaultName] = new SecretClient(url, credential, opts);
     }
-    const client = new SecretClient(url, credential, opts);
+
+    const client = secretClientCache[keyVaultName];
 
     try {
         const secret = await client.getSecret(secretName);
@@ -45,7 +52,7 @@ const getKeyVaultSecret = async function (keyVaultName, secretName, keyVaultCACe
 
         return secretValue;
     } catch (error) {
-        console.error(logAppName, `failed to read secret ${secretName} from ${url}: ${error}`);
+        console.error(logAppName, `failed to read secret ${secretName} from ${url}: ${error.message}`);
         return null;
     }
 };
@@ -64,7 +71,6 @@ const secretTag = {
         defaultValue: ''
     }],
     async run(context, secretName) {
-
         const keyVaultName = await context.context.AZURE_KEYVAULT;
         const keyVaultCACert = await context.context.AZURE_KEYVAULT_CA_CERT;
 
@@ -73,10 +79,10 @@ const secretTag = {
             return '';
         }
 
-        const secretValue = getKeyVaultSecret(keyVaultName, secretName, keyVaultCACert);
+        const secretValue = await getKeyVaultSecret(keyVaultName, secretName, keyVaultCACert);
 
         return secretValue;
     }
-}
+};
 
 module.exports.templateTags = [secretTag];
